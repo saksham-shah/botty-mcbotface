@@ -1,0 +1,23 @@
+{
+  "name": "botty-mcbotface",
+  "version": "1.0.0",
+  "description": "A discord bot with the sole purpose of being superior to You Fool.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saksham-shah/botty-mcbotface.git"
+  },
+  "author": "Saksham Shah",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saksham-shah/botty-mcbotface/issues"
+  },
+  "homepage": "https://github.com/saksham-shah/botty-mcbotface#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "dotenv": "^8.2.0"
+  }
+}
