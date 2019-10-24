@@ -30,7 +30,16 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
                         }
                         examplesText += `\n`;
                     }
-                    helpEmbed.addField('**Example:**', examplesText);
+                    helpEmbed.addField('**Examples:**', examplesText);
+                }
+
+                // Some commands have extra notes
+                if (help.notes) {
+                    var notesText = ``;
+                    for (var note of help.notes) {
+                        notesText += `${note}\n`;
+                    }
+                    helpEmbed.addField('**Notes:**', notesText);
                 }
             } else {
                 helpEmbed.setTitle(`Unfortunately, there are no further instructions on the usage of \`${prefix}${commandName}\``);
