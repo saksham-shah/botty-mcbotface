@@ -1,4 +1,4 @@
-const prefix = require('../botconfig.js').PREFIX;
+const prefix = process.env.PREFIX;
 
 module.exports = require('../botcommand.js')('joke').setHandler((message, client, args) => {
     var channelId = message.channel.id;
@@ -25,7 +25,6 @@ module.exports = require('../botcommand.js')('joke').setHandler((message, client
     if (args == '') {
         seconds = -1;
     }
-    console.log(args == '');
     var jokeText = `Here's a joke for **${message.author.username}**:\n\nQ: ${chosenJoke.q}\n\nA: Type \`${prefix}joke answer\` to see!`
     message.channel.send(jokeText)
     .then(msg => {

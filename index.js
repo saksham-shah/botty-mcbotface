@@ -8,8 +8,6 @@ const client = new Discord.Client();
 
 const token = process.env.BOT_TOKEN;
 
-const prefix = require('./botconfig.js').PREFIX;
-
 // Creates event listeners for each event in the 'events' folder
 fs.readdir('./events/', (err, files) => {
     files.forEach(file => {

@@ -33,7 +33,7 @@ function playNextSong(guildId, channel) {
     console.log(`Now playing: ${song.title}`);
     channel.send(`Now playing: ${song.title}`)
 
-    const dispatcher = serverQueue.connection.play(ytdl(song.link))
+    const dispatcher = serverQueue.connection.play(ytdl(song.link, { filter: 'audioonly' }))
     .on('end', () => {
         serverQueue.songs.shift();
         console.log('Song ended, playing next song');

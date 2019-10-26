@@ -1,5 +1,5 @@
 var Discord = require('discord.js');
-const prefix = require('../botconfig.js').PREFIX;
+const prefix = process.env.PREFIX;
 
 module.exports = require('../botcommand.js')('help').setHandler((message, client, commandName, commands) => {
     // Uses a rich embed to send help instructions

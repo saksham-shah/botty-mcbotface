@@ -1,3 +1,4 @@
 module.exports = {
-  PREFIX: '?'
+  PREFIX: '?',
+  DEV: true
 }

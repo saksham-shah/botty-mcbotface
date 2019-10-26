@@ -16,18 +16,24 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
     
     console.log(`Searching YouTube: ${msgContents}`);
     message.channel.send(`Searching YouTube: ${msgContents}`);
-    const searchResults = await ytsr(msgContents).catch(console.log);
-    var song = null;
-    var count = 0;
-    while (!song && count < 5) {
-        song = searchResults.items[count].type == 'video' ? searchResults.items[count] : null;
-        count++;
+
+    const filters = await ytsr.getFilters(msgContents).catch(console.log);
+    const filter = filters.get('Type').find(f => f.name === 'Video');
+    const options = {
+        limit: 1,
+        nextpageRef: filter.ref
     }
-    // const song = searchResults.items[0];
+    const searchResults = await ytsr(null, options);
+    var song = null;
+    if (searchResults.items.length > 0) {
+        song = searchResults.items[0];
+    }
+
     if (!song) {
         console.log('No results found');
         return message.channel.send('No results found');
     }
+
     console.log(`Found song: ${song.title}`);
 
     var serverQueue = queue.getQueue(message.guild.id);
