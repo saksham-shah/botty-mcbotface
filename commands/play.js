@@ -4,7 +4,7 @@ var ytsr = require('ytsr');
 
 module.exports = require('../botcommand.js')('play').setHandler(async (message, client, msgContents) => {
     
-    const voiceChannel = message.member.voiceChannel;
+    const voiceChannel = message.member.voice.channel;
     if (!voiceChannel) return message.channel.send('Get into a voice channel!');
 
     const permissions = voiceChannel.permissionsFor(message.client.user);
@@ -14,6 +14,8 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
 
     if (!msgContents) return message.channel.send('You need to enter some text to search.')
     
+    console.log(`Searching YouTube: ${msgContents}`);
+    message.channel.send(`Searching YouTube: ${msgContents}`);
     const searchResults = await ytsr(msgContents).catch(console.log);
     var song = null;
     var count = 0;
@@ -22,7 +24,11 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
         count++;
     }
     // const song = searchResults.items[0];
-    if (!song) return message.channel.send('You did something wrong there, not me.');
+    if (!song) {
+        console.log('No results found');
+        return message.channel.send('No results found');
+    }
+    console.log(`Found song: ${song.title}`);
 
     var serverQueue = queue.getQueue(message.guild.id);
     if (!serverQueue) {
@@ -37,8 +43,10 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
         queue.setQueue(message.guild.id, thisQueue);
         thisQueue.songs.push(song);
         try {
+            console.log('Joining voice channel');
 			var connection = await voiceChannel.join();
             thisQueue.connection = connection;
+            console.log('Joined voice channel');
 		} catch (err) {
             console.log(err);
             queue.deleteQueue(message.guild.id);
@@ -47,6 +55,7 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
         queue.playSong(message.guild.id, message.channel);
     } else {
         serverQueue.songs.push(song);
+        console.log('Song already playing, adding to queue');
         message.channel.send(`Adding to queue: ${song.title}`);
     }
 }).setHelp({

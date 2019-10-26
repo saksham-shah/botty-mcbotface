@@ -17,9 +17,9 @@
   },
   "homepage": "https://github.com/saksham-shah/botty-mcbotface#readme",
   "dependencies": {
-    "discord.js": "^11.5.1",
+    "discord.js": "github:discordjs/discord.js",
     "dotenv": "^8.2.0",
-    "ffmpeg-binaries": "^4.0.0",
+    "ffmpeg": "0.0.4",
     "node-opus": "^0.3.3",
     "ytdl-core": "^1.0.0",
     "ytsr": "^0.1.8"

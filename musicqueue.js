@@ -23,17 +23,20 @@ function playNextSong(guildId, channel) {
     const serverQueue = queues.get(guildId);
     if (!serverQueue) return;
     if (serverQueue.songs.length == 0) {
+        console.log('Queue empty, leaving voice channel');
         serverQueue.voiceChannel.leave();
         queues.delete(guildId);
         return;
     }
 
     const song = serverQueue.songs[0];
+    console.log(`Now playing: ${song.title}`);
     channel.send(`Now playing: ${song.title}`)
 
-    const dispatcher = serverQueue.connection.playStream(ytdl(song.link))
+    const dispatcher = serverQueue.connection.play(ytdl(song.link))
     .on('end', () => {
         serverQueue.songs.shift();
+        console.log('Song ended, playing next song');
         playNextSong(guildId, channel);
     })
     .on('error', console.log);

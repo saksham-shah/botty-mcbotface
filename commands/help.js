@@ -3,7 +3,7 @@ const prefix = require('../botconfig.js').PREFIX;
 
 module.exports = require('../botcommand.js')('help').setHandler((message, client, commandName, commands) => {
     // Uses a rich embed to send help instructions
-    var helpEmbed = new Discord.RichEmbed()
+    var helpEmbed = new Discord.MessageEmbed()
     .setColor('RED')
     .setAuthor(`${client.user.username} Help Manual`, client.user.avatarURL)
     .setFooter(`Type \'${prefix}help <command>\' for more info on a command.`)
