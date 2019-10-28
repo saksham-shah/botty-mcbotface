@@ -5,17 +5,17 @@ var ytsr = require('ytsr');
 module.exports = require('../botcommand.js')('play').setHandler(async (message, client, msgContents) => {
     
     const voiceChannel = message.member.voice.channel;
-    if (!voiceChannel) return message.channel.send('Get into a voice channel!');
+    if (!voiceChannel) return message.channel.send('**Get into a voice channel!**');
 
     const permissions = voiceChannel.permissionsFor(message.client.user);
     if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) {
-		return message.channel.send('error need more perms MORE PERMS');
+		return message.channel.send('**error need more perms MORE PERMS**');
     }
 
-    if (!msgContents) return message.channel.send('You need to enter some text to search.')
+    if (!msgContents) return message.channel.send('**You need to enter some text to search.**')
     
     console.log(`Searching YouTube: ${msgContents}`);
-    message.channel.send(`Searching YouTube: ${msgContents}`);
+    message.channel.send(`**Searching YouTube for** \`${msgContents}\``);
 
     const filters = await ytsr.getFilters(msgContents).catch(console.log);
     const filter = filters.get('Type').find(f => f.name === 'Video');
@@ -23,7 +23,10 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
         limit: 1,
         nextpageRef: filter.ref
     }
-    const searchResults = await ytsr(null, options);
+    const searchResults = await ytsr(null, options).catch((err) => {
+        console.log(err);
+        message.channel.send('**No results found**');
+    });
     var song = null;
     if (searchResults.items.length > 0) {
         song = searchResults.items[0];
@@ -31,7 +34,7 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
 
     if (!song) {
         console.log('No results found');
-        return message.channel.send('No results found');
+        return message.channel.send('**No results found**');
     }
 
     console.log(`Found song: ${song.title}`);
@@ -42,9 +45,7 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
 			textChannel: message.channel,
 			voiceChannel: voiceChannel,
 			connection: null,
-			songs: [],
-			volume: 1,
-			playing: true,
+			songs: []
         };
         queue.setQueue(message.guild.id, thisQueue);
         thisQueue.songs.push(song);
@@ -62,9 +63,10 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
     } else {
         serverQueue.songs.push(song);
         console.log('Song already playing, adding to queue');
-        message.channel.send(`Adding to queue: ${song.title}`);
+        message.channel.send(queue.songInfoEmbed(song).setTitle(`Adding to the queue`));
     }
 }).setHelp({
+    category: 'Music',
     text: 'Adds a song to the queue',
     syntax: 'search | URL',
     examples: [

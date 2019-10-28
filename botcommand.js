@@ -31,6 +31,15 @@ class BotCommand {
     }
 
     setHelp(help) {
+        if (!help.category) {
+            help.category = 'General';
+        }
+        if (help.important === undefined) {
+            help.important = true;
+        }
+        if (!help.syntax) {
+            help.syntax = '';
+        }
         this.helpOptions = help;
         return this;
     }

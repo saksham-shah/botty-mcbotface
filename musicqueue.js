@@ -1,5 +1,6 @@
 var queues = new Map();
 var ytdl = require('ytdl-core');
+var Discord = require('discord.js');
 
 module.exports = {
     setQueue: (guildId, queueObj) => {
@@ -11,12 +12,9 @@ module.exports = {
     deleteQueue: guildId => {
         return queues.delete(guildId);
     },
-    playSong: (guildId, channel) => {
-        return playNextSong(guildId, channel);
-    },
-    getDispatcher: (guildId) => {
-        return getDispatcher(guildId);
-    }
+    playSong: playNextSong,
+    getDispatcher: getDispatcher,
+    songInfoEmbed: songInfoEmbed
 }
 
 function playNextSong(guildId, channel) {
@@ -31,17 +29,15 @@ function playNextSong(guildId, channel) {
 
     const song = serverQueue.songs[0];
     console.log(`Now playing: ${song.title}`);
-    channel.send(`Now playing: ${song.title}`)
+    channel.send(songInfoEmbed(song).setTitle('Now playing'));
 
-    const dispatcher = serverQueue.connection.play(ytdl(song.link, { filter: 'audioonly' }))
+    serverQueue.connection.play(ytdl(song.link, { filter: 'audioonly' }))
     .on('end', () => {
         serverQueue.songs.shift();
         console.log('Song ended, playing next song');
         playNextSong(guildId, channel);
     })
     .on('error', console.log);
-
-    dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
 }
 
 function getDispatcher(guildId) {
@@ -49,10 +45,12 @@ function getDispatcher(guildId) {
     return serverQueue.connection.dispatcher;
 }
 
-function endCurrentSong(guildId, channel, endAll) {
-    var serverQueue = queues.get(guildId);
-    if (endAll) {
-        serverQueue.songs = [];
-    }
-    serverQueue.connection.dispatcher.end();
+function songInfoEmbed(song) {
+    var songEmbed = new Discord.MessageEmbed()
+    .setColor('RED')
+    .setFooter(`Type \`${process.env.PREFIX}play <search phrase>\` to play audio from YouTube`)
+    .setDescription(`**${song.title}**`)
+    .setThumbnail(song.thumbnail)
+    .addField('More information', `By: ${song.author.name}\nUploaded: ${song.uploaded_at}\nDuration: ${song.duration}\nViews: ${song.views}`);
+    return songEmbed;
 }
