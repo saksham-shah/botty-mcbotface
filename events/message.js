@@ -15,6 +15,10 @@ fs.readdir('./commands/', (err, files) => {
 })
 
 module.exports = require('../botevent.js')('message').setHandler((client, message) => {
+    // Special development channel
+    if (process.env.STATUS === 'dev' && message.channel.id !== '638667677577248768') return;
+    if (process.env.STATUS === 'prod' && message.channel.id === '638667677577248768') return;
+    
     // Only works in text channels for now
     if (!(message.channel instanceof Discord.TextChannel)) return;
     // Doesn't respond to itself
@@ -30,10 +34,10 @@ module.exports = require('../botevent.js')('message').setHandler((client, messag
     // Special case for 'help' command
     if (command == 'help') {
         // Bot is unavaliable while in development
-        if (process.env.STATUS === 'dev'){
-            if (message.author.id !== '554751081310060550') return message.channel.send('Sorry, I am currently under maintenance and will be unavailable for some time. Please try again later.');
-            message.channel.send('Admin account detected. Bypassing maintenance mode.');
-        } 
+        // if (process.env.STATUS === 'dev'){
+        //     if (message.author.id !== '554751081310060550') return message.channel.send('Sorry, I am currently under maintenance and will be unavailable for some time. Please try again later.');
+        //     message.channel.send('Admin account detected. Bypassing maintenance mode.');
+        // } 
         commands.help.handler(message, client, commandArgs, commands);
         return;
     }
@@ -41,10 +45,10 @@ module.exports = require('../botevent.js')('message').setHandler((client, messag
     // Only calls a handler if that command exists
     if (commands[command]) {
         // Bot is unavaliable while in development
-        if (process.env.STATUS === 'dev'){
-            if (message.author.id !== '554751081310060550') return message.channel.send('Sorry, I am currently under maintenance and will be unavailable for some time. Please try again later.');
-            message.channel.send('Admin account detected. Bypassing maintenance mode.');
-        } 
+        // if (process.env.STATUS === 'dev'){
+        //     if (message.author.id !== '554751081310060550') return message.channel.send('Sorry, I am currently under maintenance and will be unavailable for some time. Please try again later.');
+        //     message.channel.send('Admin account detected. Bypassing maintenance mode.');
+        // } 
         commands[command].handler(message, client, commandArgs);
     }
 });

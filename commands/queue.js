@@ -7,7 +7,7 @@ module.exports = require('../botcommand.js')('queue').setHandler((message, clien
     var songs = serverQueue.songs;
     var queueEmbed = new Discord.MessageEmbed()
     .setColor('RED')
-    .setFooter(`Type \`${process.env.PREFIX}skip\` to skip the current video`)
+    .setFooter(`Type '${process.env.PREFIX}skip' to skip the current video`)
     .setTitle('Now playing')
     .setDescription(`**${songs[0].title}**`)
     .setThumbnail(songs[0].thumbnail);

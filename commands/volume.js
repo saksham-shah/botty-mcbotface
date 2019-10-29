@@ -3,18 +3,19 @@ var queue = require('../musicqueue.js');
 module.exports = require('../botcommand.js')('volume').setHandler((message, client, volume) => {
     if (!message.member.voice.channel) return message.channel.send('**Get into a voice channel!**');
     var serverQueue = queue.getQueue(message.guild.id);
-    if (!serverQueue) return message.channel.send(`**Queue is empty right now. Use \`${process.env.PREFIX}play\` to play a song!**`);
+    if (!serverQueue) return message.channel.send(`**Nothing is playing right now. Use \`${process.env.PREFIX}play\` to play a song!**`);
     if (!serverQueue.connection) return message.channel.send('**Setting up connection, please wait.**');    
 
-    var dispatcher = queue.getDispatcher(message.guild.id);
+    var queueObj = queue.getQueue(message.guild.id);
 
     if (!isNaN(volume) && volume) {
         if (volume > 3 || volume < 0) return message.channel.send('**Volume is outside the accepted range (0 to 3).**')
-        volume = Math.floor(volume * 10) * 0.1;
-        dispatcher.setVolumeLogarithmic(volume);
+        volume = Math.floor(volume * 10) / 10;
+        queueObj.connection.dispatcher.setVolumeLogarithmic(volume);
+        queueObj.volume = volume;
         return message.channel.send(`**Setting volume to** \`${volume}\``);
     }
-    message.channel.send(`**Current volume:** \`${dispatcher.volumeLogarithmic}\``);
+    message.channel.send(`**Current volume:** \`${queueObj.volume}\``);
 }).setHelp({
     category: 'Music',
     important: false,

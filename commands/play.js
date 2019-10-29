@@ -12,7 +12,7 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
 		return message.channel.send('**error need more perms MORE PERMS**');
     }
 
-    if (!msgContents) return message.channel.send('**You need to enter some text to search.**')
+    if (!msgContents) return message.channel.send('**You need to enter some text to search!**')
     
     console.log(`Searching YouTube: ${msgContents}`);
     message.channel.send(`**Searching YouTube for** \`${msgContents}\``);
@@ -44,7 +44,9 @@ module.exports = require('../botcommand.js')('play').setHandler(async (message, 
         const thisQueue = {
 			textChannel: message.channel,
 			voiceChannel: voiceChannel,
-			connection: null,
+            connection: null,
+            volume: 1,
+            loop: false,
 			songs: []
         };
         queue.setQueue(message.guild.id, thisQueue);

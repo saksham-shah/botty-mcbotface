@@ -28,16 +28,22 @@ function playNextSong(guildId, channel) {
     }
 
     const song = serverQueue.songs[0];
-    console.log(`Now playing: ${song.title}`);
-    channel.send(songInfoEmbed(song).setTitle('Now playing'));
+    if (!serverQueue.loop) {
+        console.log(`Now playing: ${song.title}`);
+        channel.send(songInfoEmbed(song).setTitle('Now playing'));
+    }
 
     serverQueue.connection.play(ytdl(song.link, { filter: 'audioonly' }))
     .on('end', () => {
-        serverQueue.songs.shift();
-        console.log('Song ended, playing next song');
+        console.log('Song ended');
+        if (!serverQueue.loop) {
+            serverQueue.songs.shift();
+            console.log('Playing next song');
+        }
         playNextSong(guildId, channel);
     })
-    .on('error', console.log);
+    .on('error', console.log)
+    .setVolumeLogarithmic(serverQueue.volume);
 }
 
 function getDispatcher(guildId) {
@@ -48,7 +54,7 @@ function getDispatcher(guildId) {
 function songInfoEmbed(song) {
     var songEmbed = new Discord.MessageEmbed()
     .setColor('RED')
-    .setFooter(`Type \`${process.env.PREFIX}play <search phrase>\` to play audio from YouTube`)
+    .setFooter(`Type '${process.env.PREFIX}play <search phrase>' to play audio from YouTube`)
     .setDescription(`**${song.title}**`)
     .setThumbnail(song.thumbnail)
     .addField('More information', `By: ${song.author.name}\nUploaded: ${song.uploaded_at}\nDuration: ${song.duration}\nViews: ${song.views}`);
