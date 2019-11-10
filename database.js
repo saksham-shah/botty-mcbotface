@@ -1,7 +1,7 @@
 
 var process = require('process');
 var MongoClient = require('mongodb').MongoClient;
-var url = process.env.MONGO_URL || 'mongodb://localhost:27017/';
+var url = process.env.MONGODB_URI || 'mongodb://localhost:27017/';
 
 var connection;
 var db;
@@ -14,7 +14,13 @@ module.exports = {
 
 async function init() {
     connection = await MongoClient.connect(url);
-    db = connection.db(process.env.MONGO_DB || 'mcbotface');
+    // db = connection.db(process.env.MONGO_DB || 'mcbotface');
+    if (process.env.MONGODB_URI) {
+        db = connection.db();
+    } else {
+        db = connection.db('mcbotface');
+    }
+    
     console.log('Connected to database');
     return db;
 }
