@@ -10,10 +10,10 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
     }
     if (data[channelId][userId]) {
         if (args == 'reveal') {
-            revealJoke(channelId, message.author);
+            revealJoke(channelId, message.member);
             return;
         }
-        message.channel.send(`**${message.author.username}**, you have a joke pending! Wait before asking for another one.`);
+        message.channel.send(`**${message.member.nickname || message.author.username}**, you have a joke pending! Wait before asking for another one.`);
         return;
     }
 
@@ -29,11 +29,11 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
         seconds = -1;
     }
     // var jokeText = `Here's a joke for **${message.author.username}**:\n\n${chosenJoke.setup}\n\nType \`${prefix}joke reveal\` to see the rest!`
-    message.channel.send(jokeEmbed(chosenJoke, message.author, false))
+    message.channel.send(jokeEmbed(chosenJoke, message.member, false))
     .then(msg => {
         data[channelId][userId].msg = msg;
         if (seconds >= 0) {
-            setTimeout(revealJoke, (+args) * 1000, channelId, message.author)
+            setTimeout(revealJoke, (+args) * 1000, channelId, message.member)
         }
     });
 }).setHelp({
@@ -61,19 +61,19 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
 
 const data = {};
 
-function revealJoke(channelId, user) {
-    var joke = data[channelId][user.id].joke;
-    var msg = data[channelId][user.id].msg;
-    msg.edit(jokeEmbed(joke, user, true));
-    data[channelId][user.id] = undefined;
+function revealJoke(channelId, member) {
+    var joke = data[channelId][member.user.id].joke;
+    var msg = data[channelId][member.user.id].msg;
+    msg.edit(jokeEmbed(joke, member, true));
+    data[channelId][member.user.id] = undefined;
 }
 
-function jokeEmbed(joke, user, reveal) {
+function jokeEmbed(joke, member, reveal) {
     var embed = new Discord.MessageEmbed()
     .setColor('RED')
-    .setTitle(`Here's a joke for **${user.username}**`)
+    .setTitle(`Here's a joke for **${member.nickname || member.user.username}**`)
     .setFooter('Jokes brought to you by official-joke-api.appshot.com')
-    .setThumbnail(user.avatarURL());
+    .setThumbnail(member.user.avatarURL());
     if (reveal) {
         embed.addField(joke.setup, joke.punchline);
         return embed;

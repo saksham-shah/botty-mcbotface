@@ -1,18 +1,35 @@
 const fs = require('fs');
 
 const Discord = require('discord.js');
-// const prefix = require('../botconfig.js').PREFIX;
 const prefix = process.env.PREFIX;
-const dev = require('../botconfig.js').DEV;
 
 var commands = {};
 
 // Goes through all of the commands in the 'commands' folder and adds it to the object
-fs.readdir('./commands/', (err, files) => {
-    files.forEach(file => {
-        require(`../commands/${file}`).addToDict(commands);
-    })
-})
+checkDirectory('');
+
+// console.log(fs.lstatSync('./commands/help.js').isDirectory());
+// fs.readdir('./commands/', (err, files) => {
+//     files.forEach(file => {
+//         require(`../commands/${file}`).addToDict(commands);
+//     })
+// })
+
+async function checkDirectory(path) {
+    fs.readdir(`./commands/${path}`, (err, contents) => {
+        contents.forEach((pathName) => {
+            var pathObj = fs.lstatSync(`./commands/${path}/${pathName}`);
+            if (pathObj.isDirectory()) {
+                checkDirectory(pathName);
+            } else {
+                var command = require(`../commands/${path}/${pathName}`);
+                if (!command.disabled) {
+                    command.addToDict(commands);
+                }
+            }
+        });
+    });
+}
 
 module.exports = require('../botevent.js')('message').setHandler((client, message) => {
     // Special development channel
@@ -28,27 +45,19 @@ module.exports = require('../botevent.js')('message').setHandler((client, messag
 
     // Splits the message into command and commandArgs
     var messageWords = message.content.slice(prefix.length).split(' ');
-    var command = messageWords.shift();
+    var command = messageWords.shift().toLowerCase();
     var commandArgs = messageWords.join(' ');
 
     // Special case for 'help' command
     if (command == 'help') {
-        // Bot is unavaliable while in development
-        // if (process.env.STATUS === 'dev'){
-        //     if (message.author.id !== '554751081310060550') return message.channel.send('Sorry, I am currently under maintenance and will be unavailable for some time. Please try again later.');
-        //     message.channel.send('Admin account detected. Bypassing maintenance mode.');
-        // } 
         commands.help.handler(message, client, commandArgs, commands);
         return;
     }
 
     // Only calls a handler if that command exists
     if (commands[command]) {
-        // Bot is unavaliable while in development
-        // if (process.env.STATUS === 'dev'){
-        //     if (message.author.id !== '554751081310060550') return message.channel.send('Sorry, I am currently under maintenance and will be unavailable for some time. Please try again later.');
-        //     message.channel.send('Admin account detected. Bypassing maintenance mode.');
-        // } 
+        // Admin commands are only usable by admins
+        if (commands[command].admin && message.author.id !== '554751081310060550') return message.channel.send(`**Sorry, this command is admin-only.**`);
         commands[command].handler(message, client, commandArgs);
     }
 });

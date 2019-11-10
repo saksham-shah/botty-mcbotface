@@ -1,6 +1,6 @@
-var queue = require('../musicqueue.js');
+var queue = require('../../musicqueue.js');
 
-module.exports = require('../botcommand.js')('volume').setHandler((message, client, volume) => {
+module.exports = require('../../botcommand.js')('volume').setHandler((message, client, volume) => {
     if (!message.member.voice.channel) return message.channel.send('**Get into a voice channel!**');
     var serverQueue = queue.getQueue(message.guild.id);
     if (!serverQueue) return message.channel.send(`**Nothing is playing right now. Use \`${process.env.PREFIX}play\` to play a song!**`);

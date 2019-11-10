@@ -10,6 +10,10 @@ class BotCommand {
         this.handler = null;
         // Details on the help text of the command
         this.helpOptions = null;
+        // Some commands are only avaliable to the admin (me)
+        this.admin = false;
+        // Some commands may be disabled
+        this.disabled = false;
     }
 
     getName() {
@@ -41,6 +45,18 @@ class BotCommand {
             help.syntax = '';
         }
         this.helpOptions = help;
+        return this;
+    }
+
+    // Sets a command as admin only
+    adminOnly() {
+        this.admin = true;
+        return this;
+    }
+
+    // Disables a command
+    disable() {
+        this.disabled = true;
         return this;
     }
 
