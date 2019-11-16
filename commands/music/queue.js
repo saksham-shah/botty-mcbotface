@@ -1,13 +1,13 @@
 var queue = require('../../musicqueue.js');
 var Discord = require('discord.js');
 
-module.exports = require('../../botcommand.js')('queue').setHandler((message, client, volume) => {
+module.exports = require('../../botcommand.js')('queue').setHandler((message, client, msgContents, prefix) => {
     var serverQueue = queue.getQueue(message.guild.id);
-    if (!serverQueue) return message.channel.send(`**The queue is empty right now. Use \`${process.env.PREFIX}play\` to play a song!**`);
+    if (!serverQueue) return message.channel.send(`**The queue is empty right now. Use \`${prefix}play\` to play a song!**`);
     var songs = serverQueue.songs;
     var queueEmbed = new Discord.MessageEmbed()
     .setColor('RED')
-    .setFooter(`Type '${process.env.PREFIX}skip' to skip the current video`)
+    .setFooter(`Type '${prefix}skip' to skip the current video`)
     .setTitle('Now playing')
     .setDescription(`**${songs[0].title}**`)
     .setThumbnail(songs[0].thumbnail);

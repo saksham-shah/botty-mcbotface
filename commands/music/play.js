@@ -67,7 +67,7 @@ module.exports = require('../../botcommand.js')('play').setHandler(async (messag
         console.log('Song already playing, adding to queue');
         message.channel.send(queue.songInfoEmbed(song).setTitle(`Adding to the queue`));
     }
-}).setHelp({
+}).setPermissions('MUSIC').setHelp({
     category: 'Music',
     text: 'Adds a song to the queue',
     syntax: 'search | URL',

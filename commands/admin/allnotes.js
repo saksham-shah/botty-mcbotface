@@ -23,4 +23,4 @@ module.exports = require('../../botcommand.js')('allnotes').setHandler(async (me
 
     return message.channel.send(noteEmbed);
     
-}).adminOnly();
+}).setPermissions('SERVER');

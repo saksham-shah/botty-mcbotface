@@ -1,7 +1,8 @@
 var Discord = require('discord.js');
-const prefix = process.env.PREFIX;
 
-module.exports = require('../botcommand.js')('help').setHandler((message, client, input, commands) => {
+const perms = require('../permissions.js');
+
+module.exports = require('../botcommand.js')('help').setHandler((message, client, input, prefix, memberPerms, commands) => {
     // quick easter egg
     if (input === 'help help help help help') {
         const attachment = new Discord.MessageAttachment('https://www.thorntons.co.uk/on/demandware.static/-/Sites-thorntons-live-products/default/dw8b4656bb/product-images/2019-2020/Spring-S2/New-Easter-Images/77180596-Bunny-Milk-Egg.jpg');
@@ -14,6 +15,8 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
     .setAuthor(`${client.user.username} Help Manual`, client.user.avatarURL())
     .setFooter(`Type \'${prefix}help <command>\' for more info on a command or \'${prefix}help <category>\' for more info on a category`)
     .setThumbnail('https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Pictogram_voting_question.svg/220px-Pictogram_voting_question.svg.png');
+
+    if (!memberPerms) helpEmbed.addField('**NOTE:** You haven\'t made an account here yet...', `Use \`${prefix}register <name>\` to create an account and unlock more commands!`);
 
     // If the user has requested help for a specific command (which exists)
     if (commands[input.toLowerCase()]) {
@@ -65,6 +68,9 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
         var help = commands[command].getHelp();
         // Only shows commands which have a help object
         if (!help) continue;
+        // Only shows commands which the user can use
+        var permsNeeded = commands[command].getPermissions();
+        if (permsNeeded >= 0 && !perms.all(permsNeeded, memberPerms)) continue;
         // Splits the commands into their categories
         var category = help.category.toLowerCase();
         // Initialise an array for a category if it hasn't been done yet
@@ -83,7 +89,7 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
         var categoryName = input.toLowerCase();
         var commandsText = ``;
         for (var command of categories[categoryName].commands) {
-            commandsText += helpText(command);
+            commandsText += helpText(command, prefix);
         }
         helpEmbed.addField(`**${categories[categoryName].name}**`, commandsText);
         return message.channel.send(helpEmbed);
@@ -94,14 +100,14 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
         for (var command of categories[category].commands) {
             // Some commands are not important enough to be shown in the main help message
             if (!command.getHelp().important) continue;
-            commandsText += helpText(command);
+            commandsText += helpText(command, prefix);
         }
         if (commandsText) {
             helpEmbed.addField(`**${categories[category].name}**`, commandsText);
         }
     }
     helpEmbed.setDescription(`Hi **${message.author.username}**, I'm ${client.user.username}!`);
-    
+
     message.channel.send(helpEmbed);
 }).setHelp({
     category: 'help',
@@ -114,7 +120,7 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
 });
 
 // Generates the line of help text for a command
-function helpText(command) {
+function helpText(command, prefix) {
     var name = command.getName();
     var help = command.getHelp();
     var txt = '';

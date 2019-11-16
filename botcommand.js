@@ -1,3 +1,5 @@
+var perms = require('./permissions.js');
+
 module.exports = (commandName) => {
     return (new BotCommand()).setName(commandName);
 }
@@ -14,6 +16,8 @@ class BotCommand {
         this.admin = false;
         // Some commands may be disabled
         this.disabled = false;
+        // Some commands have required permissions
+        this.permissions = -1;
     }
 
     getName() {
@@ -46,6 +50,15 @@ class BotCommand {
         }
         this.helpOptions = help;
         return this;
+    }
+
+    setPermissions() {
+        this.permissions = perms.getPermNum(...arguments);
+        return this;
+    }
+
+    getPermissions() {
+        return this.permissions;
     }
 
     // Sets a command as admin only

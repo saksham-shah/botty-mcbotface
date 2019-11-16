@@ -1,15 +1,14 @@
-const prefix = process.env.PREFIX;
 const fetch = require('node-fetch');
 const Discord = require('discord.js');
 
-module.exports = require('../botcommand.js')('joke').setHandler(async (message, client, args) => {
+module.exports = require('../botcommand.js')('joke').setHandler(async (message, client, msgContents, prefix) => {
     var channelId = message.channel.id;
     var userId = message.author.id;
     if (!data[channelId]) {
         data[channelId] = {};
     }
     if (data[channelId][userId]) {
-        if (args == 'reveal') {
+        if (msgContents == 'reveal') {
             revealJoke(channelId, message.member);
             return;
         }
@@ -22,18 +21,17 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
     var chosenJoke = await response.json();
     data[channelId][userId].joke = chosenJoke;
     var seconds = -1;
-    if (!isNaN(args)) {
-        seconds = +args;
+    if (!isNaN(msgContents)) {
+        seconds = +msgContents;
     }
-    if (args == '') {
+    if (msgContents == '') {
         seconds = -1;
     }
-    // var jokeText = `Here's a joke for **${message.author.username}**:\n\n${chosenJoke.setup}\n\nType \`${prefix}joke reveal\` to see the rest!`
     message.channel.send(jokeEmbed(chosenJoke, message.member, false))
     .then(msg => {
         data[channelId][userId].msg = msg;
         if (seconds >= 0) {
-            setTimeout(revealJoke, (+args) * 1000, channelId, message.member)
+            setTimeout(revealJoke, (+msgContents) * 1000, channelId, message.member)
         }
     });
 }).setHelp({
@@ -42,11 +40,11 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
     examples: [
         {
             syntax: '',
-            result: `Tells a joke and reveals the punchline when \`${prefix}joke reveal\` is typed`
+            result: `Tells a joke and reveals the punchline when \`joke reveal\` is typed`
         },
         {
             syntax: '3',
-            result: `Tells a joke and reveals the punchline after 3 seconds, or when \`${prefix}joke reveal\` is typed`
+            result: `Tells a joke and reveals the punchline after 3 seconds, or when \`joke reveal\` is typed`
         },
         {
             syntax: 'reveal',
