@@ -2,32 +2,31 @@ var permText = {
     ADMIN: 'Full admin',
     SERVER: 'Server admin',
     MUSIC: 'Manage music',
-    NOTES: 'Manage notes',
-    GIVE: 'Give roles'
+    NOTES: 'Manage notes'
 }
 
-module.exports = { permText, getPermNum, getPerms, all, any };
-
-var permissions = {};
+var permNums = {};
 var counter = 1;
 for (var perm in permText) {
-    permissions[perm] = counter;
+    permNums[perm] = counter;
     counter *= 2;
 }
+
+module.exports = { permText, permNums, getPermNum, getPerms, all, any };
 
 function getPermNum() {
     var num = 0;
     for (var perm of arguments) {
-        if (!permissions[perm]) continue;
-        num |= permissions[perm];
+        if (!permNums[perm]) continue;
+        num |= permNums[perm];
     }
     return num;
 }
 
 function getPerms(num) {
     var perms = [];
-    for (var perm in permissions) {
-        if (num & permissions[perm]) {
+    for (var perm in permNums) {
+        if (num & permNums[perm]) {
             perms.push(perm);
         }
     }

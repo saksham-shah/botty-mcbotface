@@ -18,6 +18,11 @@ class BotCommand {
         this.disabled = false;
         // Some commands have required permissions
         this.permissions = -1;
+        // Some commands have aliases
+        this.aliases = [];
+        // Some commands have cooldowns
+        this.cooldown = 2;
+        this.cooldowns = new Map();
     }
 
     getName() {
@@ -57,8 +62,31 @@ class BotCommand {
         return this;
     }
 
-    getPermissions() {
-        return this.permissions;
+    setAliases() {
+        this.aliases = [...arguments];
+        return this;
+    }
+
+    setCooldown(cooldown) {
+        this.cooldown = cooldown;
+        return this;
+    }
+
+    checkCooldown(userId) {
+        const now = Date.now();
+
+        if (this.cooldowns.has(userId)) {
+            const expireTime = this.cooldowns.get(userId) + this.cooldown * 1000;
+            if (now < expireTime) {
+                return (expireTime - now) / 1000;
+            }
+        }
+        return 0;
+    }
+
+    setUserCooldown(userId) {
+        this.cooldowns.set(userId, Date.now());
+        setTimeout(() => this.cooldowns.delete(userId), this.cooldown * 1000);
     }
 
     // Sets a command as admin only
@@ -74,8 +102,8 @@ class BotCommand {
     }
 
     // Adds the command to an object
-    addToDict(obj) {
-        obj[this.commandName] = this;
-        return obj;
+    addToMap(map) {
+        map.set(this.commandName, this);
+        return map;
     }
 }

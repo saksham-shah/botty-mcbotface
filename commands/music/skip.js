@@ -10,7 +10,7 @@ module.exports = require('../../botcommand.js')('skip').setHandler(async (messag
     message.channel.send(`**Skipping** \`${song.title}\``);
     serverQueue.loop = false;
     queue.getDispatcher(message.guild.id).end();
-}).setPermissions('MUSIC').setHelp({
+}).setPermissions('MUSIC').setAliases('s', 'next').setHelp({
     category: 'Music',
     text: 'Skip the currently playing song'
 });

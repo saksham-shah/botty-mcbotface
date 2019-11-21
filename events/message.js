@@ -8,7 +8,7 @@ var cached = dbHelper.getCached();
 
 const perms = require('../permissions.js');
 
-var commands = {};
+var commands = new Map();
 
 // Goes through all of the commands in the 'commands' folder and adds it to the object
 checkDirectory('./commands');
@@ -22,7 +22,7 @@ async function checkDirectory(path) {
             } else {
                 var command = require(`.${path}/${pathName}`);
                 if (!command.disabled) {
-                    command.addToDict(commands);
+                    command.addToMap(commands);
                 }
             }
         });
@@ -49,48 +49,47 @@ module.exports = require('../botevent.js')('message').setHandler(async (client, 
         var messageWords = message.content.slice(prefix.length).split(' ');
     }
     
-    var command;
+    var commandWord;
     do {
-        command = messageWords.shift().toLowerCase();;
-    } while (!command && messageWords.length > 0)
-    // var command = messageWords.shift().toLowerCase();
+        commandWord = messageWords.shift().toLowerCase();;
+    } while (!commandWord && messageWords.length > 0)
     var commandArgs = messageWords.join(' ');
 
     var member = await dbHelper.getMember(message.author.id, message.guild.id);
     var memberPerms = null;
     if (member) memberPerms = member.perms;
 
+    var command = commands.get(commandWord) || Array.from(commands.values()).find(cmd => cmd.aliases.includes(commandWord));
+    if (!command) return;
+
+    // Only calls a handler if that command exists
+    // if (commands[command]) {
+    var cooldown = command.checkCooldown(message.author.id);
+    if (cooldown > 0) return message.channel.send(`**Please wait ${cooldown.toFixed(1)} seconds before reusing the \`${commandWord}\` command!**`);
+
     // Special case for 'help' command
-    if (command == 'help') {
-        commands.help.handler(message, client, commandArgs, prefix, memberPerms, commands);
+    if (commandWord == 'help') {
+        command.handler(message, client, commandArgs, prefix, memberPerms, commands);
         return;
     }
 
-    // Only calls a handler if that command exists
-    if (commands[command]) {
-        var permsNeeded = commands[command].getPermissions();
-        if (permsNeeded >= 0) {
-            if (!memberPerms) return message.channel.send(`**Use \`${prefix}register <name>\` to register with the bot and use this command!**`);
-            if (!perms.all(permsNeeded, memberPerms)) {
-                var missingPerms = perms.getPerms(permsNeeded & ~memberPerms);
-                message.channel.send('**You don\'t have one or more required permissions to use this command!**');
-                message.channel.send(`Missing permissions for \`${prefix}${command}\`: ${missingPerms.map(perm => perms.permText[perm]).join(', ')}`);
-                return;
-            }
+    var permsNeeded = command.permissions;
+    if (permsNeeded >= 0) {
+        if (!memberPerms) return message.channel.send(`**Use \`${prefix}register <name>\` to register with the bot and use this command!**`);
+        if (!perms.all(permsNeeded, memberPerms)) {
+            var missingPerms = perms.getPerms(permsNeeded & ~memberPerms);
+            message.channel.send('**You don\'t have one or more required permissions to use this command!**');
+            message.channel.send(`Missing permissions for \`${prefix}${commandWord}\`: ${missingPerms.map(perm => perms.permText[perm]).join(', ')}`);
+            return;
         }
-
-        var result = await commands[command].handler(message, client, commandArgs, prefix, memberPerms);
-        if (!result) return;
-        if (result.status == 'HELP') {
-            commands.help.handler(message, client, command, prefix, memberPerms, commands);
-        }
-
-        // Admin commands are only usable by admins
-        // if (commands[command].admin && message.author.id !== '554751081310060550') return message.channel.send(`**Sorry, this command is admin-only.**`);
-        // var result = await commands[command].handler(message, client, commandArgs);
-        // if (!result) return;
-        // if (result.status == 'HELP') {
-        //     commands.help.handler(message, client, command, commands);
-        // }
     }
+
+    var result = await command.handler(message, client, commandArgs, prefix, memberPerms);
+    if (result) {
+        if (result.status == 'HELP') {
+            return commands.get('help').handler(message, client, commandWord, prefix, memberPerms, commands);
+        }
+    }
+    command.setUserCooldown(message.author.id);
+    // }
 });

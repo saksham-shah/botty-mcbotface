@@ -2,4 +2,4 @@ module.exports = require('../../botcommand.js')('echo').setHandler(async (messag
     if (!msgContents) return;
     message.channel.send(msgContents);
     message.delete();
-}).setPermissions('ADMIN');
+}).setPermissions('ADMIN').setAliases('repeat');

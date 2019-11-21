@@ -23,4 +23,8 @@ module.exports = require('../../botcommand.js')('allnotes').setHandler(async (me
 
     return message.channel.send(noteEmbed);
     
-}).setPermissions('SERVER');
+}).setPermissions('SERVER').setAliases('alltags').setHelp({
+    category: 'Admin',
+    important: false,
+    text: 'Shows you all of the notes in this server'
+});

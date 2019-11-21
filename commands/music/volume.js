@@ -16,7 +16,7 @@ module.exports = require('../../botcommand.js')('volume').setHandler((message, c
         return message.channel.send(`**Setting volume to** \`${volume}\``);
     }
     message.channel.send(`**Current volume:** \`${queueObj.volume}\``);
-}).setPermissions('MUSIC').setHelp({
+}).setPermissions('MUSIC').setAliases('v').setHelp({
     category: 'Music',
     important: false,
     text: 'Change the volume of music, or check what the volume currently is',

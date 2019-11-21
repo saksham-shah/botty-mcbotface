@@ -9,7 +9,7 @@ module.exports = require('../../botcommand.js')('loop').setHandler(async (messag
     var queueObj = queue.getQueue(message.guild.id);
     if (queueObj.loop = !queueObj.loop) return message.channel.send('**Loop enabled**');
     return message.channel.send('**Loop disabled**');
-}).setPermissions('MUSIC').setHelp({
+}).setPermissions('MUSIC').setAliases('l').setHelp({
     category: 'Music',
     important: false,
     text: 'Loop the currently playing song'

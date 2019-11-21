@@ -9,7 +9,7 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
     }
     if (data[channelId][userId]) {
         if (msgContents == 'reveal') {
-            revealJoke(channelId, message.member);
+            revealJoke(channelId, message.member, prefix);
             return;
         }
         message.channel.send(`**${message.member.nickname || message.author.username}**, you have a joke pending! Wait before asking for another one.`);
@@ -27,11 +27,11 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
     if (msgContents == '') {
         seconds = -1;
     }
-    message.channel.send(jokeEmbed(chosenJoke, message.member, false))
+    message.channel.send(jokeEmbed(chosenJoke, message.member, false, prefix))
     .then(msg => {
         data[channelId][userId].msg = msg;
         if (seconds >= 0) {
-            setTimeout(revealJoke, (+msgContents) * 1000, channelId, message.member)
+            setTimeout(revealJoke, (+msgContents) * 1000, channelId, message.member, prefix)
         }
     });
 }).setHelp({
@@ -59,14 +59,14 @@ module.exports = require('../botcommand.js')('joke').setHandler(async (message, 
 
 const data = {};
 
-function revealJoke(channelId, member) {
+function revealJoke(channelId, member, prefix) {
     var joke = data[channelId][member.user.id].joke;
     var msg = data[channelId][member.user.id].msg;
-    msg.edit(jokeEmbed(joke, member, true));
+    msg.edit(jokeEmbed(joke, member, true, prefix));
     data[channelId][member.user.id] = undefined;
 }
 
-function jokeEmbed(joke, member, reveal) {
+function jokeEmbed(joke, member, reveal, prefix) {
     var embed = new Discord.MessageEmbed()
     .setColor('RED')
     .setTitle(`Here's a joke for **${member.nickname || member.user.username}**`)

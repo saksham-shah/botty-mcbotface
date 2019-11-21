@@ -19,9 +19,10 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
     if (!memberPerms) helpEmbed.addField('**NOTE:** You haven\'t made an account here yet...', `Use \`${prefix}register <name>\` to create an account and unlock more commands!`);
 
     // If the user has requested help for a specific command (which exists)
-    if (commands[input.toLowerCase()]) {
-        var commandName = input.toLowerCase();
-        var help = commands[commandName].getHelp();
+    var command = commands.get(input.toLowerCase()) || Array.from(commands.values()).find(cmd => cmd.aliases.includes(input.toLowerCase()));
+    if (command) {
+        var commandName = command.commandName;
+        var help = command.getHelp();
         // Only displays help text if there is any
         if (help) {
             // Displays the command syntax
@@ -30,6 +31,16 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
             // Some commands have text describing what they do
             if (help.text) {
                 helpEmbed.setDescription(help.text);
+            }
+
+            // Some commands have aliases
+            if (command.aliases.length > 0) {
+                helpEmbed.addField('**Aliases:**', command.aliases.join(', '));
+            }
+
+            // Some commands have a cooldown
+            if (command.cooldown > 2) {
+                helpEmbed.addField('**Cooldown:**', `${command.cooldown} seconds`);
             }
 
             // Some commands have examples of usage which can be displayed
@@ -51,11 +62,7 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
 
             // Some commands have extra notes
             if (help.notes) {
-                var notesText = ``;
-                for (var note of help.notes) {
-                    notesText += `${note}\n`;
-                }
-                helpEmbed.addField('**Notes:**', notesText);
+                helpEmbed.addField('**Notes:**', help.notes.join('\n'));
             }
 
             return message.channel.send(helpEmbed);
@@ -64,12 +71,12 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
 
     // If the user has requested for help without typing a specific command
     var categories = {};
-    for (var command in commands) {
-        var help = commands[command].getHelp();
+    for (var [commandName, command] of commands) {
+        var help = command.getHelp();
         // Only shows commands which have a help object
         if (!help) continue;
         // Only shows commands which the user can use
-        var permsNeeded = commands[command].getPermissions();
+        var permsNeeded = command.permissions;
         if (permsNeeded >= 0 && !perms.all(permsNeeded, memberPerms)) continue;
         // Splits the commands into their categories
         var category = help.category.toLowerCase();
@@ -81,7 +88,7 @@ module.exports = require('../botcommand.js')('help').setHandler((message, client
             };
         }
         // Add the command to the respective category
-        categories[category].commands.push(commands[command]);
+        categories[category].commands.push(command);
     }
 
     // If the user has requested for help for specific category

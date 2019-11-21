@@ -2,7 +2,7 @@ var Discord = require('discord.js');
 var db = require('../database.js').getDB();
 const perms = require('../permissions.js');
 
-module.exports = require('../botcommand.js')('note').setHandler(async (message, client, msgContents, memberPerms, prefix) => {
+module.exports = require('../botcommand.js')('note').setHandler(async (message, client, msgContents, prefix, memberPerms) => {
     var collection = db.collection('notes');
     if (!msgContents) return { status: 'HELP' };
 
@@ -60,7 +60,7 @@ module.exports = require('../botcommand.js')('note').setHandler(async (message, 
             return message.channel.send(noteEmbed);
     }
     
-}).setHelp({
+}).setAliases('n', 'tags').setHelp({
     text: 'Creates, edits and views notes',
     syntax: '[\'create\' | \'edit\' | \'delete\'] noteName [content]',
     examples: [

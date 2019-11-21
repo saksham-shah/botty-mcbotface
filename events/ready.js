@@ -16,7 +16,7 @@ module.exports = require('../botevent.js')('ready').setHandler(async client => {
         if (!result) {
             var serverObj = {
                 serverId: id,
-                prefix: '!',
+                prefix: '?',
                 defaultPerms: perms.getPermNum('NOTES', 'MUSIC')
             }
             collection.insertOne(serverObj);

@@ -22,7 +22,7 @@ module.exports = require('../../botcommand.js')('queue').setHandler((message, cl
     queueEmbed.addField('Up next', queueText);
 
     message.channel.send(queueEmbed);
-}).setHelp({
+}).setAliases('q').setHelp({
     category: 'Music',
     important: false,
     text: 'See what videos are in the queue'
