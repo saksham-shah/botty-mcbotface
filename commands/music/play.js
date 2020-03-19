@@ -3,7 +3,6 @@ var ytdl = require('ytdl-core');
 var ytsr = require('ytsr');
 
 module.exports = require('../../botcommand.js')('play').setHandler(async (message, client, msgContents) => {
-    
     const voiceChannel = message.member.voice.channel;
     if (!voiceChannel) return message.channel.send('**Get into a voice channel!**');
 

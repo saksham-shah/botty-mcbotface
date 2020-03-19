@@ -79,7 +79,7 @@ module.exports = require('../botevent.js')('message').setHandler(async (client, 
         if (!perms.all(permsNeeded, memberPerms)) {
             var missingPerms = perms.getPerms(permsNeeded & ~memberPerms);
             message.channel.send('**You don\'t have one or more required permissions to use this command!**');
-            message.channel.send(`Missing permissions for \`${prefix}${commandWord}\`: ${missingPerms.map(perm => perms.permText[perm]).join(', ')}`);
+            message.channel.send(`Missing permissions for \`${commandWord}\`: ${missingPerms.map(perm => perms.permText[perm]).join(', ')}`);
             return;
         }
     }

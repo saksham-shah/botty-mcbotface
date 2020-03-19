@@ -32,19 +32,19 @@ module.exports = require('../../botcommand.js')('permissions').setHandler(async 
         
             var newPerms = botMember.perms;
 
-            embed.addField(`Currently editing permissions`, 'To toggle a permission, simply type the number of the permission you want to change. Type anything else to stop changing permissions.')
+            embed.addField(`Currently editing permissions`, 'To toggle a permission, simply type the number of the permission you want to change. Will time out after 10 seconds of inactivity.')
             var sentMessage = await message.channel.send(embed);
 
             var collectorFilter = m => m.member == message.member;
             var collector = message.channel.createMessageCollector(collectorFilter)
             .on('collect', msg => {
                 var index = parseInt(msg.content);
-                if (isNaN(index) || index <= 0 || index > permsToUse.length) return collector.stop();
+                if (isNaN(index) || index <= 0 || index > permsToUse.length) return;// collector.stop();
                 
                 newPerms ^= perms.permNums[permsToUse[index - 1]];
 
                 var embed = permsEmbed(botUser.name, message.member.nickname || message.author.username, message.guild.name, newPerms, permsToUse, member.user.avatarURL(), self);
-                embed.addField(`Currently editing permissions`, 'To toggle a permission, simply type the number of the permission you want to change. Type anything else to stop changing permissions.');
+                embed.addField(`Currently editing permissions`, 'To toggle a permission, simply type the number of the permission you want to change. Will time out after 10 seconds of inactivity.');
 
                 sentMessage.edit(embed);
                 msg.delete();
