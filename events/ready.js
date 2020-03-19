@@ -9,7 +9,7 @@ module.exports = require('../botevent.js')('ready').setHandler(async client => {
     client.user.setActivity(`${process.env.PREFIX}help`);
 
     var collection = db.collection('servers');
-    for (var [id, guild] of client.guilds) {
+    for (var [id, guild] of client.guilds.cache) {
         if (!guild.available) continue;
 
         var result = await collection.findOne({ serverId: id });
