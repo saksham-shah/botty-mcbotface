@@ -5,4 +5,4 @@ module.exports = require('../botcommand.js')('updated').setHandler((message, cli
     text: 'Check when the bot was last updated'
 });
 
-const lastUpdated = '5pm 21 november. this is hard coded into the program which is a terrible idea but eh.'
+const lastUpdated = '9pm 19 march. this is hard coded into the program which is a terrible idea but eh.'
