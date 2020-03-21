@@ -34,7 +34,7 @@ function playNextSong(guildId, channel) {
     }
 
     serverQueue.connection.play(ytdl(song.link, { filter: 'audioonly' }))
-    .on('end', () => {
+    .on('finish', () => {
         console.log('Song ended');
         if (!serverQueue.loop) {
             serverQueue.songs.shift();
